@@ -1,0 +1,139 @@
+:root {
+    --font: 'Lato', sans-serif;
+
+    --obs: #ab193a;
+    --bg-good: #d4ebe6;
+    --cta-dark: #06775e;
+    --cta-light: #02cb9e;
+    --cta: #099878;
+    --bg-bad: #edd7dc;
+    --signal: #fe4412;
+    --text: #4a4a4a;
+    --text-light: #949494;
+    --bg: #f8f5f2;
+    --bg-dark: #ebe5e0;
+    --bg-light: #fffdfa;
+    --white: #ffffff;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 30px;
+    line-height: 40px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+html {
+    /*height: 100%;*/
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.43;
+    color: var(--text);
+}
+
+input {
+    font-family: var(--font);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font);
+    line-height: 1.5;
+    color: var(--text);
+    border: none;
+    background: none;
+}
+
+button:disabled {
+    cursor: default;
+}
+
+button:focus {
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+textarea {
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    color: #4a4a4a;
+    padding: 10px;
+}
+
+body {
+    background: var(--bg);
+}
+
+main {
+    max-width: 1024px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.inputs textarea {
+    width: 100%;
+    display: block;
+    flex-grow: 1;
+    height: 100px;
+}
+
+.inputs button {
+    display: block;
+    width: 200px;
+    margin-top: 10px;
+    color: #fff;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 2px;
+    background-color: var(--cta);
+}
+
+.inputs button:active {
+    background-color: var(--cta-dark);
+}
+
+.message {
+    font-size: 16px;
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 2px;
+    box-shadow: 0 0px 10px 0px rgba(155, 155, 155, 0.5);
+}
