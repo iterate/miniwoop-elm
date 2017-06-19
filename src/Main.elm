@@ -60,7 +60,10 @@ view : Model -> Html Msg
 view model =
     main_ [ class "main" ]
         [ h1 [] [ text "MiniWoop" ]
-        , div [ class "inputs" ] [ textarea [ placeholder "Skriv inn melding", onInput TextInput, value model.textInput ] [], button [ onClick AddMessage ] [ text "Send" ] ]
+        , div [ class "inputs" ]
+            [ textarea [ placeholder "Skriv inn melding", onInput TextInput, value model.textInput ] []
+            , button [ onClick AddMessage ] [ text "Send" ]
+            ]
         , div [ class "messages" ]
             (List.map viewMessage model.messages)
         ]
