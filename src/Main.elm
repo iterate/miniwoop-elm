@@ -3,6 +3,9 @@ module Main exposing (main)
 import Html exposing (Html, text, textarea, form, button, div, main_, h1)
 import Html.Attributes exposing (class, value, placeholder)
 import Html.Events exposing (onInput, onSubmit, onClick)
+import Request.Message
+import Http
+import Data.Message exposing (Message)
 
 
 -- Model
@@ -14,19 +17,13 @@ type alias Model =
     }
 
 
-type alias Message =
-    { text : String }
-
-
-initialModel : Model
-initialModel =
-    { messages =
-        [ Message "Hei"
-        , Message "Dette er en test"
-        , Message "Lorem ipsum dolar sit amet"
-        ]
-    , textInput = ""
-    }
+init : ( Model, Cmd Msg )
+init =
+    ( { messages = []
+      , textInput = ""
+      }
+    , Request.Message.list |> Http.send MessagesReceived
+    )
 
 
 
@@ -36,20 +33,37 @@ initialModel =
 type Msg
     = TextInput String
     | AddMessage
+    | MessagesReceived (Result Http.Error (List Message))
+    | MessagePosted (Result Http.Error (List Message))
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TextInput text ->
-            { model | textInput = text }
+            { model | textInput = text } ! []
 
         AddMessage ->
             let
                 message =
                     Message model.textInput
             in
-                { model | messages = message :: model.messages, textInput = "" }
+                model
+                    ! [ Request.Message.post message
+                            |> Http.send MessagePosted
+                      ]
+
+        MessagesReceived (Ok messages) ->
+            { model | messages = messages |> List.reverse } ! []
+
+        MessagesReceived (Err err) ->
+            Debug.crash <| "Could not get messages " ++ (toString err)
+
+        MessagePosted (Ok messages) ->
+            { model | messages = messages |> List.reverse, textInput = "" } ! []
+
+        MessagePosted (Err err) ->
+            Debug.crash <| "Could not get messages " ++ (toString err)
 
 
 
@@ -75,10 +89,16 @@ viewMessage message =
         [ text message.text ]
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = initialModel
+    Html.program
+        { init = init
         , view = view
         , update = update
+        , subscriptions = subscriptions
         }
