@@ -129,6 +129,9 @@ main {
 }
 
 .message {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+
     font-size: 16px;
     width: 100%;
     background-color: #fff;
@@ -136,4 +139,63 @@ main {
     margin-bottom: 20px;
     border-radius: 2px;
     box-shadow: 0 0px 10px 0px rgba(155, 155, 155, 0.5);
+}
+
+.message .text {
+    flex-grow: 1;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #ccc;
+}
+
+.message .user {
+    font-style: italic;
+    align-self: center;
+}
+
+.message .woops {
+    font-size: 20px;
+    align-self: center;
+}
+
+.message .woop-button {
+    align-self: center;
+    display: block;
+    color: #fff;
+    height: 30px;
+    font-size: 16px;
+    border-radius: 2px;
+    background-color: var(--cta);
+    margin-left: 10px;
+}
+
+.set-username {
+    display: grid;
+    grid-template-rows: auto 40px;
+    grid-template-columns: 400px;
+    justify-content: center;
+}
+
+.set-username h2 {
+    text-align: center;
+}
+
+.set-username input {
+    grid-row-start: 2;
+    padding-left: 10px;
+    font-size: 16px;
+}
+
+.set-username button {
+    font-size: 16px;
+    grid-row-start: 2;
+    color: #fff;
+    height: 100%;
+    width: 60px;
+    font-size: 16px;
+    border-radius: 2px;
+    background-color: var(--cta);
 }
