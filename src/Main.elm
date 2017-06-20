@@ -1,3 +1,17 @@
+-- http://iter.at/elmkurs
+--
+-- npm install -g elm elm-live
+-- mkdir miniwoop-elm2
+-- mkdir src
+-- touch src/Main.elm
+-- elm-live --output=elm.js src/Main.elm --open --debug
+-- 1. Hello World
+-- 2. Add Model with messages / init with beginnerProgram / AddMessage
+-- 3. Go on
+-- TODO:
+-- Upload css and index.html
+
+
 module Main exposing (main)
 
 import Html exposing (Html, text, textarea, form, button, div, main_, h1, h2, input)
