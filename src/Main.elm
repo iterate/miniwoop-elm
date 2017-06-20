@@ -34,7 +34,7 @@ type Msg
     = TextInput String
     | AddMessage
     | MessagesReceived (Result Http.Error (List Message))
-    | MessagePosted (Result Http.Error (List Message))
+    | MessagePosted (Result Http.Error Message)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,7 +60,7 @@ update msg model =
             Debug.crash <| "Could not get messages " ++ (toString err)
 
         MessagePosted (Ok messages) ->
-            { model | messages = messages |> List.reverse, textInput = "" } ! []
+            { model | textInput = "" } ! [ Request.Message.list |> Http.send MessagesReceived ]
 
         MessagePosted (Err err) ->
             Debug.crash <| "Could not get messages " ++ (toString err)

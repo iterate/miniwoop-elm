@@ -5,11 +5,16 @@ import Json.Decode as Decode
 import Http
 
 
+url : String -> String
+url endpoint =
+    "http://localhost:5000" ++ endpoint
+
+
 list : Http.Request (List Message)
 list =
-    Http.get "http://127.0.0.1:8080/messages" (Decode.list Message.decoder)
+    Http.get (url "/messages") (Decode.list Message.decoder)
 
 
-post : Message -> Http.Request (List Message)
+post : Message -> Http.Request Message
 post msg =
-    Http.post "http://127.0.0.1:8080/messages" (Http.jsonBody <| Message.encode msg) (Decode.list Message.decoder)
+    Http.post (url "/messages") (Http.jsonBody <| Message.encode msg) Message.decoder
