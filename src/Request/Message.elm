@@ -7,7 +7,7 @@ import Http
 
 url : String -> String
 url endpoint =
-    "http://localhost:5000" ++ endpoint
+    "https://miniwoop-backend.app.iterate.no" ++ endpoint
 
 
 list : Http.Request (List Message)

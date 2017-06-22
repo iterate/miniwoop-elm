@@ -8,8 +8,6 @@
 -- 1. Hello World
 -- 2. Add Model with messages / init with beginnerProgram / AddMessage
 -- 3. Go on
--- TODO:
--- Upload css and index.html
 
 
 module Main exposing (main)
