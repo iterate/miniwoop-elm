@@ -98,6 +98,27 @@ main {
     margin: 0 auto;
 }
 
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .counter {
+    font-size: 25px;
+    margin-right: -10px;
+}
+
+header .counter button {
+    font-size: 25px;
+    background-color: var(--cta);
+    color: #fff;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 40px;
+    font-weight: bold;
+}
+
 .inputs {
     width: 100%;
     display: flex;
@@ -128,7 +149,7 @@ main {
     background-color: var(--cta-dark);
 }
 
-.message {
+.post {
     display: grid;
     grid-template-columns: 1fr auto auto;
 
@@ -141,7 +162,7 @@ main {
     box-shadow: 0 0px 10px 0px rgba(155, 155, 155, 0.5);
 }
 
-.message .text {
+.post .text {
     flex-grow: 1;
     grid-column-start: 1;
     grid-column-end: 4;
@@ -151,17 +172,17 @@ main {
     border-top: 1px solid #ccc;
 }
 
-.message .user {
+.post .user {
     font-style: italic;
     align-self: center;
 }
 
-.message .woops {
+.post .woops {
     font-size: 20px;
     align-self: center;
 }
 
-.message .woop-button {
+.post .woop-button {
     align-self: center;
     display: block;
     color: #fff;

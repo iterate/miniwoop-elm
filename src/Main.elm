@@ -6,25 +6,26 @@
 -- touch src/Main.elm
 -- elm-live --output=elm.js src/Main.elm --open --debug
 -- 1. Hello World
--- 2. Add Model with messages / init with beginnerProgram / AddMessage
+-- 2. Add Model with posts / init with beginnerProgram / AddPost
 -- 3. Go on
 
 
 module Main exposing (main)
 
-import Html exposing (Html, text, textarea, form, button, div, main_, h1, h2, input)
+import Html exposing (Html, text, textarea, form, button, div, main_, h1, h2, input, header, i)
 import Html.Attributes exposing (class, value, placeholder)
 import Html.Events exposing (onInput, onSubmit, onClick)
-import Request.Message
+import Request.Post
 import Http
-import Data.Message exposing (PostMessage, Message)
+import Data.Post exposing (NewPost, Post)
 
 
 -- Model
 
 
 type alias Model =
-    { messages : List Message
+    { likes : Int
+    , posts : List Post
     , textInput : String
     , username : Maybe String
     , usernameInput : String
@@ -33,12 +34,13 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { messages = []
+    ( { likes = 0
+      , posts = []
       , textInput = ""
-      , username = Nothing
+      , username = Just "Sindre"
       , usernameInput = ""
       }
-    , Request.Message.list |> Http.send MessagesReceived
+    , Request.Post.list |> Http.send PostsReceived
     )
 
 
@@ -48,13 +50,15 @@ init =
 
 type Msg
     = TextInput String
-    | AddMessage String
-    | MessagesReceived (Result Http.Error (List Message))
-    | MessagePosted (Result Http.Error Message)
+    | AddPost String
+    | PostsReceived (Result Http.Error (List Post))
+    | PostPosted (Result Http.Error Post)
     | InputUsername String
     | SetUsername
-    | WoopClick Message
-    | MessageWooped (Result Http.Error Message)
+    | LikeClick Post
+    | PostLiked (Result Http.Error Post)
+    | Increment
+    | Decrement
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,21 +67,21 @@ update msg model =
         TextInput text ->
             { model | textInput = text } ! []
 
-        AddMessage user ->
+        AddPost user ->
             let
-                message =
-                    PostMessage model.textInput user
+                post =
+                    NewPost model.textInput user
             in
                 model
-                    ! [ Request.Message.post message
-                            |> Http.send MessagePosted
+                    ! [ Request.Post.post post
+                            |> Http.send PostPosted
                       ]
 
-        MessagesReceived (Ok messages) ->
-            { model | messages = messages |> List.reverse } ! []
+        PostsReceived (Ok posts) ->
+            { model | posts = posts |> List.reverse } ! []
 
-        MessagesReceived (Err err) ->
-            Debug.crash <| "Could not get messages " ++ (toString err)
+        PostsReceived (Err err) ->
+            Debug.crash <| "Could not get posts " ++ (toString err)
 
         InputUsername input ->
             { model | usernameInput = input } ! []
@@ -85,20 +89,26 @@ update msg model =
         SetUsername ->
             { model | username = Just model.usernameInput } ! []
 
-        MessagePosted (Ok messages) ->
-            { model | textInput = "" } ! [ Request.Message.list |> Http.send MessagesReceived ]
+        PostPosted (Ok posts) ->
+            { model | textInput = "" } ! [ Request.Post.list |> Http.send PostsReceived ]
 
-        MessagePosted (Err err) ->
-            Debug.crash <| "Could not post message " ++ (toString err)
+        PostPosted (Err err) ->
+            Debug.crash <| "Could not create post " ++ (toString err)
 
-        WoopClick msg ->
-            model ! [ Request.Message.woop msg |> Http.send MessageWooped ]
+        LikeClick msg ->
+            model ! [ Request.Post.woop msg |> Http.send PostLiked ]
 
-        MessageWooped (Ok messages) ->
-            { model | textInput = "" } ! [ Request.Message.list |> Http.send MessagesReceived ]
+        PostLiked (Ok posts) ->
+            { model | textInput = "" } ! [ Request.Post.list |> Http.send PostsReceived ]
 
-        MessageWooped (Err err) ->
-            Debug.crash <| "Could not woop message " ++ (toString err)
+        PostLiked (Err err) ->
+            Debug.crash <| "Could not like post " ++ (toString err)
+
+        Increment ->
+            { model | likes = model.likes + 1 } ! []
+
+        Decrement ->
+            { model | likes = model.likes - 1 } ! []
 
 
 
@@ -108,25 +118,32 @@ update msg model =
 view : Model -> Html Msg
 view model =
     main_ [ class "main" ]
-        [ h1 [] [ text "MiniWoop" ]
+        [ header []
+            [ h1 [] [ text "MiniWoop" ]
+            , div [ class "counter" ]
+                [ button [ onClick Increment ] [ text "+" ]
+                , text (toString model.likes)
+                , button [ onClick Decrement ] [ text "-" ]
+                ]
+            ]
         , case model.username of
             Nothing ->
                 viewSetUsername model
 
             Just username ->
-                viewMessages model username
+                viewPosts model username
         ]
 
 
-viewMessages : Model -> String -> Html Msg
-viewMessages model user =
+viewPosts : Model -> String -> Html Msg
+viewPosts model user =
     div []
         [ div [ class "inputs" ]
             [ textarea [ placeholder "Skriv inn melding", onInput TextInput, value model.textInput ] []
-            , button [ onClick (AddMessage user) ] [ text "Send" ]
+            , button [ onClick (AddPost user) ] [ text "Send" ]
             ]
-        , div [ class "messages" ]
-            (List.map viewMessage model.messages)
+        , div [ class "posts" ]
+            (List.map viewPost model.posts)
         ]
 
 
@@ -139,13 +156,13 @@ viewSetUsername model =
         ]
 
 
-viewMessage : Message -> Html Msg
-viewMessage message =
-    div [ class "message" ]
-        [ div [ class "user" ] [ text message.user ]
-        , div [ class "text" ] [ text message.text ]
-        , div [ class "woops" ] [ text (toString message.woops) ]
-        , button [ class "woop-button", onClick (WoopClick message) ] [ text "woop" ]
+viewPost : Post -> Html Msg
+viewPost post =
+    div [ class "post" ]
+        [ div [ class "user" ] [ text post.user ]
+        , div [ class "text" ] [ text post.text ]
+        , div [ class "woops" ] [ text (toString post.woops) ]
+        , button [ class "woop-button", onClick (LikeClick post) ] [ text "woop" ]
         ]
 
 

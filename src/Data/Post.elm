@@ -1,17 +1,17 @@
-module Data.Message exposing (Message, PostMessage, decoder, encode)
+module Data.Post exposing (Post, NewPost, decoder, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline exposing (decode, required)
 import Json.Encode as Encode
 
 
-type alias PostMessage =
+type alias NewPost =
     { text : String
     , user : String
     }
 
 
-type alias Message =
+type alias Post =
     { id : String
     , text : String
     , woops : Int
@@ -19,18 +19,18 @@ type alias Message =
     }
 
 
-decoder : Decoder Message
+decoder : Decoder Post
 decoder =
-    decode Message
+    decode Post
         |> required "id" Decode.string
         |> required "text" Decode.string
         |> required "woops" Decode.int
         |> required "user" Decode.string
 
 
-encode : PostMessage -> Encode.Value
-encode message =
+encode : NewPost -> Encode.Value
+encode post =
     Encode.object
-        [ ( "text", Encode.string message.text )
-        , ( "user", Encode.string message.user )
+        [ ( "text", Encode.string post.text )
+        , ( "user", Encode.string post.user )
         ]
