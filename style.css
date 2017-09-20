@@ -104,12 +104,12 @@ header {
     align-items: center;
 }
 
-header .counter {
+.counter {
     font-size: 25px;
     margin-right: -10px;
 }
 
-header .counter button {
+.counter button {
     font-size: 25px;
     background-color: var(--cta);
     color: #fff;
@@ -177,12 +177,12 @@ header .counter button {
     align-self: center;
 }
 
-.post .woops {
+.post .likes {
     font-size: 20px;
     align-self: center;
 }
 
-.post .woop-button {
+.post .like-button {
     align-self: center;
     display: block;
     color: #fff;

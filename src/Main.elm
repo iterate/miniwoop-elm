@@ -15,12 +15,17 @@ module Main exposing (main)
 import Html exposing (Html, text, textarea, form, button, div, main_, h1, h2, input, header, i)
 import Html.Attributes exposing (class, value, placeholder)
 import Html.Events exposing (onInput, onSubmit, onClick)
-import Request.Post
-import Http
-import Data.Post exposing (NewPost, Post)
 
 
 -- Model
+
+
+type alias Post =
+    { id : Int
+    , text : String
+    , likes : Int
+    , user : String
+    }
 
 
 type alias Model =
@@ -29,19 +34,19 @@ type alias Model =
     , textInput : String
     , username : Maybe String
     , usernameInput : String
+    , nextId : Int
     }
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( { likes = 0
-      , posts = []
-      , textInput = ""
-      , username = Just "Sindre"
-      , usernameInput = ""
-      }
-    , Request.Post.list |> Http.send PostsReceived
-    )
+    { likes = 0
+    , posts = []
+    , textInput = ""
+    , username = Nothing
+    , usernameInput = ""
+    , nextId = 0
+    }
 
 
 
@@ -51,64 +56,62 @@ init =
 type Msg
     = TextInput String
     | AddPost String
-    | PostsReceived (Result Http.Error (List Post))
-    | PostPosted (Result Http.Error Post)
     | InputUsername String
     | SetUsername
-    | LikeClick Post
-    | PostLiked (Result Http.Error Post)
     | Increment
     | Decrement
+    | IncrementPost Int
+    | DecrementPost Int
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         TextInput text ->
-            { model | textInput = text } ! []
+            { model | textInput = text }
 
         AddPost user ->
             let
                 post =
-                    NewPost model.textInput user
+                    { id = model.nextId
+                    , text = model.textInput
+                    , likes = 0
+                    , user = user
+                    }
             in
-                model
-                    ! [ Request.Post.post post
-                            |> Http.send PostPosted
-                      ]
-
-        PostsReceived (Ok posts) ->
-            { model | posts = posts |> List.reverse } ! []
-
-        PostsReceived (Err err) ->
-            Debug.crash <| "Could not get posts " ++ (toString err)
+                { model | posts = post :: model.posts, textInput = "", nextId = model.nextId + 1 }
 
         InputUsername input ->
-            { model | usernameInput = input } ! []
+            { model | usernameInput = input }
 
         SetUsername ->
-            { model | username = Just model.usernameInput } ! []
+            { model | username = Just model.usernameInput }
 
-        PostPosted (Ok posts) ->
-            { model | textInput = "" } ! [ Request.Post.list |> Http.send PostsReceived ]
+        IncrementPost postId ->
+            let
+                updatePost post =
+                    if post.id == postId then
+                        { post | likes = post.likes + 1 }
+                    else
+                        post
+            in
+                { model | posts = List.map updatePost model.posts }
 
-        PostPosted (Err err) ->
-            Debug.crash <| "Could not create post " ++ (toString err)
-
-        LikeClick msg ->
-            model ! [ Request.Post.woop msg |> Http.send PostLiked ]
-
-        PostLiked (Ok posts) ->
-            { model | textInput = "" } ! [ Request.Post.list |> Http.send PostsReceived ]
-
-        PostLiked (Err err) ->
-            Debug.crash <| "Could not like post " ++ (toString err)
+        DecrementPost postId ->
+            let
+                updatePost post =
+                    if post.id == postId then
+                        { post | likes = post.likes - 1 }
+                    else
+                        post
+            in
+                { model | posts = List.map updatePost model.posts }
 
         Increment ->
-            { model | likes = model.likes + 1 } ! []
+            { model | likes = model.likes + 1 }
 
         Decrement ->
-            { model | likes = model.likes - 1 } ! []
+            { model | likes = model.likes - 1 }
 
 
 
@@ -161,21 +164,18 @@ viewPost post =
     div [ class "post" ]
         [ div [ class "user" ] [ text post.user ]
         , div [ class "text" ] [ text post.text ]
-        , div [ class "woops" ] [ text (toString post.woops) ]
-        , button [ class "woop-button", onClick (LikeClick post) ] [ text "woop" ]
+        , div [ class "counter" ]
+            [ button [ onClick (IncrementPost post.id) ] [ text "+" ]
+            , text (toString post.likes)
+            , button [ onClick (DecrementPost post.id) ] [ text "-" ]
+            ]
         ]
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
 
 
 main : Program Never Model Msg
 main =
-    Html.program
-        { init = init
+    Html.beginnerProgram
+        { model = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
         }
